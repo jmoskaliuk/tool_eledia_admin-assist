@@ -9,8 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      MOODLE_CI_DIR: ${{ runner.temp }}/moodle-plugin-ci
 
     strategy:
       fail-fast: false
@@ -58,6 +56,7 @@ jobs:
 
       - name: Install Moodle
         run: |
+          MOODLE_CI_DIR="$RUNNER_TEMP/moodle-plugin-ci"
           mkdir -p "$MOODLE_CI_DIR"
           cd "$MOODLE_CI_DIR"
           moodle-plugin-ci install \
@@ -71,16 +70,16 @@ jobs:
             --db-pass=moodle
 
       - name: PHP lint
-        run: cd "$MOODLE_CI_DIR" && moodle-plugin-ci phplint
+        run: cd "$RUNNER_TEMP/moodle-plugin-ci" && moodle-plugin-ci phplint
 
       - name: Code style
-        run: cd "$MOODLE_CI_DIR" && moodle-plugin-ci phpcs --max-warnings 0
+        run: cd "$RUNNER_TEMP/moodle-plugin-ci" && moodle-plugin-ci phpcs --max-warnings 0
 
       - name: PHPDoc
-        run: cd "$MOODLE_CI_DIR" && moodle-plugin-ci phpdoc --max-warnings 0
+        run: cd "$RUNNER_TEMP/moodle-plugin-ci" && moodle-plugin-ci phpdoc --max-warnings 0
 
       - name: Validate plugin
-        run: cd "$MOODLE_CI_DIR" && moodle-plugin-ci validate
+        run: cd "$RUNNER_TEMP/moodle-plugin-ci" && moodle-plugin-ci validate
 
       - name: PHPUnit
-        run: cd "$MOODLE_CI_DIR" && moodle-plugin-ci phpunit --fail-on-warning
+        run: cd "$RUNNER_TEMP/moodle-plugin-ci" && moodle-plugin-ci phpunit --fail-on-warning
