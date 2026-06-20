@@ -44,6 +44,11 @@ jobs:
           ini-values: max_input_vars=5000
           coverage: none
 
+      - name: Setup Moodle locale
+        run: |
+          sudo locale-gen en_AU.UTF-8
+          sudo update-locale LANG=en_AU.UTF-8
+
       - name: Install moodle-plugin-ci
         run: |
           composer create-project --no-interaction --prefer-dist moodlehq/moodle-plugin-ci "$RUNNER_TEMP/moodle-plugin-ci-tool" "^4"
