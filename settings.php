@@ -1,0 +1,26 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+/**
+ * Admin settings tree entry for Admin Assist.
+ *
+ * @package    tool_adminassist
+ * @copyright  2026 eLeDia GmbH
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+if ($hassiteconfig) {
+    $ADMIN->add('tools', new admin_externalpage(
+        'tool_adminassist',
+        get_string('pluginname', 'tool_adminassist'),
+        new moodle_url('/admin/tool/adminassist/index.php'),
+        'tool/adminassist:view'
+    ));
+}

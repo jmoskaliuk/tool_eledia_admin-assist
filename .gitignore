@@ -1,0 +1,6 @@
+/.phpunit.result.cache
+/vendor/
+/node_modules/
+/coverage/
+/.moodle-plugin-ci/
+/.DS_Store

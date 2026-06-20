@@ -1,0 +1,75 @@
+name: Moodle Plugin CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        moodle-branch: [MOODLE_405_STABLE, MOODLE_500_STABLE]
+        database: [pgsql]
+        php: ['8.3']
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: moodle
+          POSTGRES_PASSWORD: moodle
+          POSTGRES_DB: moodle
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout plugin
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pgsql, zip, gd, intl, mbstring, xml, curl, soap
+          coverage: none
+
+      - name: Install moodle-plugin-ci
+        run: composer global require moodlehq/moodle-plugin-ci:^4
+
+      - name: Add composer global bin to PATH
+        run: echo "$(composer global config home)/vendor/bin" >> "$GITHUB_PATH"
+
+      - name: Install Moodle
+        run: >
+          moodle-plugin-ci install
+          --moodle=${{ matrix.moodle-branch }}
+          --db-type=${{ matrix.database }}
+          --db-host=127.0.0.1
+          --db-name=moodle
+          --db-user=moodle
+          --db-pass=moodle
+
+      - name: PHP lint
+        run: moodle-plugin-ci phplint
+
+      - name: Code style
+        run: moodle-plugin-ci phpcs --max-warnings 0
+
+      - name: PHPDoc
+        run: moodle-plugin-ci phpdoc --max-warnings 0
+
+      - name: Validate plugin
+        run: moodle-plugin-ci validate
+
+      - name: PHPUnit
+        run: moodle-plugin-ci phpunit --fail-on-warning
