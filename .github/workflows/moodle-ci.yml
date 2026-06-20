@@ -57,6 +57,7 @@ jobs:
         run: >
           moodle-plugin-ci install
           --moodle=${{ matrix.moodle-branch }}
+          --branch=${{ github.head_ref || github.ref_name }}
           --db-type=${{ matrix.database }}
           --db-host=127.0.0.1
           --db-name=moodle
